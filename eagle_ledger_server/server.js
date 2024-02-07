@@ -12,7 +12,7 @@ app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose
-  .connect("mongodb://localhost:27017/Login", {
+  .connect("mongodb://192.168.101.78:27017/Login", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -141,7 +141,7 @@ app.post("/login", async (req, res) => {
     res.status(200).json({ message: "LoginSuccess", existingUser });
     mongoose.disconnect();
     mongoose
-      .connect(`mongodb://localhost:27017/${existingUser?.dbName}`, {
+      .connect(`mongodb://192.168.101.78:27017/${existingUser?.dbName}`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
@@ -161,7 +161,7 @@ app.get("/logout", async (req, res) => {
   try {
     mongoose.disconnect();
     mongoose
-      .connect("mongodb://localhost:27017/Login", {
+      .connect("mongodb://192.168.101.78:27017/Login", {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
