@@ -24,9 +24,6 @@ mongoose
   });
 
 
-
-const storage = multer.memoryStorage();
-
 app.post("/send", (req, res) => {
   UserModel.create(req.body)
     .then((users) => res.json(users))
@@ -89,7 +86,7 @@ app.post("/signup", async (req, res) => {
   try {
     // Convert the username to lowercase for case-insensitive comparison
     const existingUser = await LogInCollection.findOne({
-      username: req.body.username?.toLowerCase(),
+      username: req.body.username,
     });
     console.log("Existing User:", existingUser);
     console.log("Signup Request:", req.body);
@@ -101,7 +98,7 @@ app.post("/signup", async (req, res) => {
     }
 
     const newUser = new LogInCollection({
-      username: req.body.username.toLowerCase(), // Save the username in lowercase
+      username: req.body.username, // Save the username in lowercase
       password: req.body.password,
     });
 
@@ -126,7 +123,7 @@ app.post("/login", async (req, res) => {
   try {
     // Convert the username to lowercase for case-insensitive comparison
     const existingUser = await LogInCollection.findOne({
-      username: req.body.username?.toLowerCase(),
+      username: req.body.username,
       password: req.body.password,
     });
 
