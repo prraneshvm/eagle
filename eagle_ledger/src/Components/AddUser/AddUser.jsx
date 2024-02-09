@@ -41,6 +41,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Snackbar from "@mui/material/Snackbar";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Loader/Loader";
 
 function AddUser() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ function AddUser() {
   const [skipped, setSkipped] = React.useState(new Set());
 
   const [file, setFile] = useState(null);
+  const [loader, setLoader] = useState(false);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -308,6 +310,7 @@ function AddUser() {
       loanDetailsData?.date !== "" &&
       loanDetailsData?.totalAmount !== ""
     ) {
+      setLoader(true)
       axios
         .post("http://localhost:4000/send", {
           id: loanDetailsData?.loanNumber,
@@ -319,9 +322,11 @@ function AddUser() {
         })
         .then((res) => {
           console.log(res);
+          setLoader(false);
           navigate("/home");
         })
         .catch((err) => {
+          setLoader(false);
           console.log(err);
         });
       handleClose();
@@ -333,6 +338,7 @@ function AddUser() {
 
   return (
     <>
+    { loader && <Loader />}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={openSnack}

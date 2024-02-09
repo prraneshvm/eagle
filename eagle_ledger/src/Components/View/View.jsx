@@ -17,6 +17,11 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import PropTypes from "prop-types";
 import { overDueCalculator, formatDateddmmyyyy } from "../../Common/Common";
+import Loader from "../Loader/Loader";
+import Backdrop from "@mui/material/Backdrop";
+
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
 
 function View() {
   const [loanNumber, setLoanNumber] = useState();
@@ -26,6 +31,9 @@ function View() {
   const [currentInstallment, setCurrentInstallment] = useState();
 
   const [fieldsRequiredAlert, setFieldsRequiredAlert] = useState(false);
+
+  const [loader, setLoader] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [paymentDetailsData, setPaymentDetailsData] = useState({
     date: "",
@@ -45,71 +53,8 @@ function View() {
   };
 
   const handleLoanNumber = (event) => {
+    setErrorMessage("");
     setLoanNumber(event.target.value);
-  };
-
-  const fetchLoanNumberData = () => {
-    axios
-      .get("http://localhost:4000/fetch/" + loanNumber)
-      .then((res) => {
-        console.log(res?.data);
-        if (typeof res?.data === "object") {
-          setLoanNumberData(res?.data);
-          setDataPresent(true);
-          handleClickOpen();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  console.log('loa', loanNumberData)
-
-  const updateLoanNumberData = () => {
-    if (
-      paymentDetailsData?.date !== "" &&
-      paymentDetailsData?.reciptNumber !== "" &&
-      paymentDetailsData?.principleAmount !== "" &&
-      paymentDetailsData?.interestAmount !== "" &&
-      paymentDetailsData?.overDueAmount !== "" &&
-      paymentDetailsData?.totalAmount !== ""
-    ) {
-      let newInstallment10 = {
-        installment: currentInstallment?.installment,
-        dueDate: currentInstallment?.dueDate,
-        paidDate: paymentDetailsData?.paidDate,
-        reciptNo: paymentDetailsData?.reciptNumber,
-        originalAmount: paymentDetailsData?.principleAmount,
-        interestAmount: paymentDetailsData?.interestAmount,
-        totalAmount: paymentDetailsData?.totalAmount,
-        overDueAmount: paymentDetailsData?.overDueAmount,
-        originalBalance: "",
-      };
-
-      let indexOfInstallment10 = loanNumberData.installmentsData.findIndex(
-        (item) => item.installment === currentInstallment?.installment
-      );
-
-      if (indexOfInstallment10 !== -1) {
-        loanNumberData.installmentsData[indexOfInstallment10] =
-          newInstallment10;
-      }
-
-      axios
-        .put(
-          "http://localhost:4000/update/" + loanNumberData?.id,
-          loanNumberData
-        )
-        .then((res) => {
-          console.log(res?.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      setFieldsRequiredAlert(true);
-    }
   };
 
   const [open, setOpen] = React.useState(false);
@@ -220,10 +165,32 @@ function View() {
     setValue(newValue);
   };
 
+  const fetchLoanNumberData = () => {
+    setLoader(true);
+    axios
+      .get("http://localhost:4000/fetch/" + loanNumber)
+      .then((res) => {
+        console.log(res?.data);
+        if (typeof res?.data === "object") {
+          setLoanNumberData(res?.data);
+          setDataPresent(true);
+          setLoader(false);
+          handleClickOpen();
+        }
+      })
+      .catch((err) => {
+        setErrorMessage("No matching user found.");
+        setLoader(false);
+      });
+  };
+
   return (
     <div>
-      
+      {loader && <Loader />}
 
+      <div>
+        {errorMessage !== "" && <Alert severity="error">{errorMessage}</Alert>}
+      </div>
       {!dataPresent && (
         <Box
           sx={{
@@ -241,7 +208,7 @@ function View() {
             <Grid container spacing={3}>
               <Grid item xs={12} sm={4}>
                 <TextField
-                autoFocus
+                  autoFocus
                   required
                   id="loanNumber"
                   name="loanNumber"
@@ -280,7 +247,7 @@ function View() {
                 <Tab label="Loan Details" {...a11yProps(0)} />
                 <Tab label="Loanee Details" {...a11yProps(1)} />
                 <Tab label="Guarantee Details" {...a11yProps(2)} />
-                
+
                 <Tab label="Vehicle Details" {...a11yProps(3)} />
               </Tabs>
             </Box>
@@ -365,7 +332,10 @@ function View() {
                       {loanNumberData?.loanDetailsData?.loanNumber}
                     </Typography>
                     <Typography>
-                      Date : {formatDateddmmyyyy(loanNumberData?.loanDetailsData?.date)}
+                      Date :{" "}
+                      {formatDateddmmyyyy(
+                        loanNumberData?.loanDetailsData?.date
+                      )}
                     </Typography>
                     <Typography>
                       Principle Amount :{" "}

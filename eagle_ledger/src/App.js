@@ -11,6 +11,7 @@ import View from "./Components/View/View";
 import Home from "./Components/Home/Home";
 import Login from "./Components/Login/Login";
 import LogoutTimer from "./Components/LogoutTimer/LogoutTimer";
+import Loader from "./Components/Loader/Loader";
 
 export const UserContext = React.createContext();
 
@@ -18,6 +19,7 @@ function App() {
   const snackbar = sessionStorage.getItem("snackbar");
 
   const [open, setOpen] = React.useState(false);
+  const [loader, setLoader] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState();
 
@@ -43,23 +45,28 @@ function App() {
 
   const handleLogout = () => {
     // Implement your logout logic here (e.g., redirect, clear session, etc.)
+    setLoader(true);
     axios
       .get("http://localhost:4000/logout")
+      //.get("http://192.168.101.83:4000/logout")
       .then((res) => {
         console.log(res);
         if (res?.status === 200 && res?.data?.message === "LogoutSuccess") {
           setLoggedIn();
+          setLoader(false);
           navigate("/login");
         }
       })
       .catch((err) => {
         console.log(err);
+        setLoader(false);
       });
     console.log("User logged out due to inactivity");
   };
 
   return (
     <div>
+      { loader && <Loader />}
       <UserContext.Provider value={{ loggedIn, setLoggedIn }}>
         {open && (
           <div>
@@ -76,7 +83,7 @@ function App() {
           </div>
         )}
         <Nav />
-        <LogoutTimer logoutCallback={handleLogout} timeoutInMinutes={1} />
+        <LogoutTimer logoutCallback={handleLogout} timeoutInMinutes={15} />
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />

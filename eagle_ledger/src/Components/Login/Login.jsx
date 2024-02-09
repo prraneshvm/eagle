@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import Alert from "@mui/material/Alert";
 import { useContext } from "react";
 import { UserContext } from "../../App";
+import Loader from "../Loader/Loader";
 
 function Login() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function Login() {
   });
 
   const [invalidCred, setInvaildCred] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const handleChangeSignup = (event) => {
     setSignupData({
@@ -62,12 +64,16 @@ function Login() {
   };
 
   const submitLogin = () => {
+    setLoader(true)
     axios
-      .post("http://localhost:4000/login", loginData)
+       .post("http://localhost:4000/login", loginData)
+      // .post("http://192.168.101.83:4000/login", loginData)
+       //.post("http://3.98.123.149:4000/login", loginData)
       .then((res) => {
         console.log("res", res);
         if (res?.status === 200 && res?.data?.message === "LoginSuccess") {
           setLoggedIn(res?.data?.existingUser)
+          setLoader(false)
           navigate("/home");
         } else {
           setInvaildCred("Invalid username or password");
@@ -78,6 +84,7 @@ function Login() {
         }
       })
       .catch((err) => {
+        setLoader(false);
         console.log(err);
         alert("Internal Server Error");
       });
@@ -120,6 +127,7 @@ function Login() {
 
   return (
     <div>
+      {loader && <Loader />}
       {/* <div>
         <h3>Signup</h3>
         <input

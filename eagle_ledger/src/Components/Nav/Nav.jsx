@@ -1,37 +1,31 @@
 import React from "react";
-import { styled } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import "./Nav.css";
 import axios from "axios";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { UserContext } from "../../App";
+import Loader from "../Loader/Loader";
 
 function Nav() {
   const navigate = useNavigate();
 
   const { loggedIn } = useContext(UserContext);
-
-  console.log("login", loggedIn);
-
-  // const {loggedIn} = useContext(UserContext)
+  const [loader, setLoader] = useState(false);
 
   const logoutApi = () => {
+    setLoader(true);
     axios
       .get("http://localhost:4000/logout")
       .then((res) => {
         console.log(res);
         if (res?.status === 200 && res?.data?.message === "LogoutSuccess") {
+          setLoader(false);
           navigate("/login");
         }
       })
       .catch((err) => {
         console.log(err);
+        setLoader(false);
       });
   };
 
@@ -54,6 +48,7 @@ function Nav() {
     //   </AppBar>
     // </Box>
     <div>
+      { loader && <Loader />}
       {!(window?.location?.pathname === "/login") && (
         <div>
           <header>
@@ -101,7 +96,7 @@ function Nav() {
                       navigate("/paymentEntry");
                     }}
                   >
-                    Recipt
+                    Receipt
                   </a>
                 </li>
                 <li>

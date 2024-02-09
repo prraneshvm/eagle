@@ -10,17 +10,17 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { overDueCalculator, formatDateddmmyyyy } from "../../Common/Common";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Loader/Loader";
 
 function PaymentEntry() {
   const navigate = useNavigate();
   const [loanNumber, setLoanNumber] = useState();
   const [loanNumberData, setLoanNumberData] = useState();
-
+  const [loader, setLoader] = useState(false);
   const [dataPresent, setDataPresent] = useState(false);
   const [currentInstallment, setCurrentInstallment] = useState();
-
-  const [overDueBalanceExtract, setOverDueBalanceExtract] = useState(0);
   const [principleBalanceTotal, setPrincipleBalanceTotal] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [paymentDetailsData, setPaymentDetailsData] = useState({
     date: "",
@@ -40,23 +40,45 @@ function PaymentEntry() {
   };
 
   const handleLoanNumber = (event) => {
+    setErrorMessage("");
     setLoanNumber(event.target.value);
   };
 
   const fetchLoanNumberData = () => {
+    setLoader(true)
     axios
       .get("http://localhost:4000/fetch/" + loanNumber)
       .then((res) => {
         if (typeof res?.data === "object") {
           setLoanNumberData(res?.data);
           setDataPresent(true);
+          setLoader(false)
           handleClickOpen();
         }
       })
       .catch((err) => {
+        setErrorMessage("No matching user found.");
+        setLoader(false)
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    let sort = [];
+    loanNumberData?.installmentsData?.forEach((item) => {
+      if (item?.originalAmount !== "") {
+        setPrincipleBalanceTotal(
+          principleBalanceTotal + parseInt(item?.originalAmount)
+        );
+      }
+      if (item?.paidDate === "") {
+        sort.push(item);
+      }
+    });
+    if (sort?.[0]) {
+      setCurrentInstallment(sort?.[0]);
+    }
+  }, [loanNumberData, loanNumber]);
 
   ///////////snack
 
@@ -92,6 +114,8 @@ function PaymentEntry() {
     setLoanNumber();
   };
 
+  console.log('@@@!! loader', loader)
+
   const updateLoanNumberData = () => {
     if (
       paymentDetailsData?.date !== "" &&
@@ -101,35 +125,13 @@ function PaymentEntry() {
       paymentDetailsData?.overDueAmount !== ""
     ) {
 
-      let remainingPayment = paymentDetailsData?.overDueAmount;
-
-      const updatedInstallments = loanNumberData?.installmentsData.map(
-        (installment) => {
-          if (installment?.paidDate !== "") {
-            const newOverdueAmountBalance = Math.max(
-              installment.overDueAmountBalance - remainingPayment,
-              0
-            );
-            const deductedAmount =
-              installment.overDueAmountBalance - newOverdueAmountBalance;
-
-            const newOverdueAmountPaid =
-              parseInt(installment.overDueAmountPaid) + deductedAmount;
-
-            remainingPayment -= deductedAmount;
-
-            return {
-              ...installment,
-              overDueAmountBalance: JSON.stringify(newOverdueAmountBalance),
-              overDueAmountPaid: JSON.stringify(newOverdueAmountPaid),
-            };
-          } else {
-            return {
-              ...installment,
-            };
-          }
-        }
-      );
+      setOpen(false);
+      setLoader(true)
+      console.log('@@!! 2')
+      const balance =
+        parseInt(loanNumberData?.loanDetailsData?.totalAmount) -
+        (parseInt(principleBalanceTotal) +
+          parseInt(paymentDetailsData?.principleAmount));
 
       let newInstallment10 = {
         installment: currentInstallment?.installment,
@@ -151,43 +153,56 @@ function PaymentEntry() {
             loanNumberData?.loanDetailsData?.interestAmountPerMo
           )
         ),
-        overDueAmountPaid: JSON.stringify(remainingPayment),
-        overDueAmountBalance: JSON.stringify(
-          JSON.stringify(
-            overDueCalculator(
-              paymentDetailsData?.date,
-              currentInstallment?.dueDate,
-              loanNumberData?.loanDetailsData?.principlePerMo,
-              loanNumberData?.loanDetailsData?.interestAmountPerMo
-            )
-          ) - remainingPayment
-        ),
-        originalBalance: JSON.stringify(
-          (principleBalanceTotal - parseInt(paymentDetailsData?.principleAmount))
-        ),
+        overDueAmountPaid: paymentDetailsData?.overDueAmount,
+        overDueAmountBalance:
+          currentInstallment?.installment === "1"
+            ? "0"
+            : currentInstallment?.overDueAmountBalance,
+        originalBalance: JSON.stringify(balance),
       };
 
-      let indexOfInstallment10 = updatedInstallments.findIndex(
+      let indexOfInstallment10 = loanNumberData?.installmentsData.findIndex(
         (item) => item.installment === currentInstallment?.installment
       );
 
       if (indexOfInstallment10 !== -1) {
-        updatedInstallments[indexOfInstallment10] = newInstallment10;
+        loanNumberData?.installmentsData?.splice(
+          indexOfInstallment10,
+          1,
+          newInstallment10
+        );
+      }
+      if (
+        indexOfInstallment10 !== -1 &&
+        indexOfInstallment10 < loanNumberData.installmentsData.length - 1
+      ) {
+        let nextIndex = indexOfInstallment10 + 1;
+        const bal =
+          newInstallment10?.overDueAmount +
+          newInstallment10?.overDueAmountBalance -
+          newInstallment10?.overDueAmountPaid;
+        loanNumberData.installmentsData[nextIndex].overDueAmountBalance =
+          JSON.stringify(bal);
       }
 
       const newLoanNumberData = { ...loanNumberData };
-      newLoanNumberData.installmentsData = updatedInstallments;
-
+      newLoanNumberData.installmentsData = [
+        ...loanNumberData?.installmentsData,
+      ];
+      
       axios
         .put(
           "http://localhost:4000/update/" + loanNumberData?.id,
           newLoanNumberData
         )
         .then((res) => {
+          setLoader(false)
           handleClose();
+          setLoader(false)
           navigate("/home");
         })
         .catch((err) => {
+          setLoader(false)
           console.log(err);
         });
     } else {
@@ -201,34 +216,12 @@ function PaymentEntry() {
     setOpen(true);
   };
 
-  useEffect(() => {
-    let sort = [];
-    loanNumberData?.installmentsData?.forEach((item) => {
-      if (
-        item?.overDueAmountBalance !== "0" &&
-        item?.overDueAmountBalance !== ""
-      ) {
-        setOverDueBalanceExtract(
-          overDueBalanceExtract + parseInt(item?.overDueAmountBalance)
-        );
-      }
-      if(item?.originalAmount !== '') {
-        setPrincipleBalanceTotal(principleBalanceTotal + parseInt(item?.originalBalance))
-      }
-      if (item?.paidDate === "") {
-        sort.push(item);
-      }
-    });
-    if (sort?.[0]) {
-      setCurrentInstallment(sort?.[0]);
-    }
-  }, [loanNumberData, loanNumber]);
-
-
-  console.log('proc', principleBalanceTotal)
-
   return (
     <div>
+      {loader && <Loader />}
+      <div>
+        {errorMessage !== "" && <Alert severity="error">{errorMessage}</Alert>}
+      </div>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={openSnack}
@@ -291,10 +284,7 @@ function PaymentEntry() {
 
       {dataPresent && (
         <React.Fragment>
-          <Dialog
-            open={open}
-            onClose={handleClose}
-          >
+          <Dialog open={open} onClose={handleClose}>
             <DialogTitle>HP Number : {loanNumberData?.id} </DialogTitle>
             <DialogTitle>
               Installment Number : {currentInstallment?.installment}{" "}
@@ -334,7 +324,16 @@ function PaymentEntry() {
                 margin="dense"
                 id="principleAmount"
                 name="principleAmount"
-                label={`Principle Amount : ${loanNumberData?.loanDetailsData?.principlePerMo}`}
+                label={
+                  loanNumberData?.installmentsData?.length ===
+                  currentInstallment?.installment
+                    ? `Principle Amount : ${
+                        loanNumberData?.installmentsData?.[
+                          loanNumberData?.installmentsData?.length - 2
+                        ]?.originalBalance
+                      }`
+                    : `Principle Amount : ${loanNumberData?.loanDetailsData?.principlePerMo}`
+                }
                 type="text"
                 fullWidth
                 variant="standard"
@@ -361,14 +360,17 @@ function PaymentEntry() {
                 id="overDueAmount"
                 name="overDueAmount"
                 label={
-                  overDueBalanceExtract > 0
-                    ? `Over Due Amount : ${overDueBalanceExtract} + ${overDueCalculator(
+                  currentInstallment?.overDueAmountBalance !== "0" ||
+                  currentInstallment?.overDueAmountBalance !== ""
+                    ? `Over Due Amount : ${
+                        currentInstallment?.overDueAmountBalance
+                      } + ${overDueCalculator(
                         paymentDetailsData?.date,
                         currentInstallment?.dueDate,
                         loanNumberData?.loanDetailsData?.principlePerMo,
                         loanNumberData?.loanDetailsData?.interestAmountPerMo
                       )} = ${
-                        overDueBalanceExtract +
+                        parseInt(currentInstallment?.overDueAmountBalance) +
                         overDueCalculator(
                           paymentDetailsData?.date,
                           currentInstallment?.dueDate,

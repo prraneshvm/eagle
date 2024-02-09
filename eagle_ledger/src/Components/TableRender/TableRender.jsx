@@ -10,6 +10,8 @@ import { formatDateddmmyyyy } from '../../Common/Common';
 
 
 export default function DenseTable(props) {
+
+  console.log('props', props)
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
@@ -22,8 +24,8 @@ export default function DenseTable(props) {
             <TableCell align="right">Principle</TableCell>
             <TableCell align="right">Interest</TableCell>
             <TableCell align="right">Over Due</TableCell>
-            <TableCell align="right">Over Due Paid</TableCell>
             <TableCell align="right">Over Due Balance</TableCell>
+            <TableCell align="right">Over Due Paid</TableCell>
             <TableCell align="right">Total</TableCell>
             <TableCell align="right">Principle Balance</TableCell>
           </TableRow>
@@ -43,8 +45,8 @@ export default function DenseTable(props) {
               <TableCell align="right">{row.paidDate ? row.originalAmount : '-'}</TableCell>
               <TableCell align="right">{row.paidDate ? row.interestAmount : '-'}</TableCell>
               <TableCell align="right">{row.overDueAmount ? row.overDueAmount : '-'}</TableCell>
-              <TableCell align="right">{row.overDueAmountPaid ? row.overDueAmountPaid : '-'}</TableCell>
               <TableCell align="right">{row.overDueAmountBalance ? row.overDueAmountBalance : '-'}</TableCell>
+              <TableCell align="right">{row.overDueAmountPaid ? row.overDueAmountPaid : '-'}</TableCell>
               <TableCell align="right">{row.paidDate ? row.totalAmount : '-'}</TableCell>
               <TableCell align="right">{row.originalBalance}</TableCell>
             </TableRow>
