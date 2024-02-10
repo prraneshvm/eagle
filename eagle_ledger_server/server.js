@@ -9,7 +9,8 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "5mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const url = 'mongodb://3.98.123.149:27017'
+//const url = 'mongodb://3.98.123.149:27017'
+const url = 'mongodb://34.69.20.170:27017' 
 //const url = "mongodb://localhost:27017";
 
 mongoose

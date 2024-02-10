@@ -3,25 +3,12 @@ import { useState } from "react";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
-
-import PropTypes from "prop-types";
-import { styled } from "@mui/material/styles";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Check from "@mui/icons-material/Check";
-import SettingsIcon from "@mui/icons-material/Settings";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import VideoLabelIcon from "@mui/icons-material/VideoLabel";
-import StepConnector, {
-  stepConnectorClasses,
-} from "@mui/material/StepConnector";
 import Button from "@mui/material/Button";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -36,7 +23,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Snackbar from "@mui/material/Snackbar";
@@ -51,10 +37,6 @@ function AddUser() {
 
   const [file, setFile] = useState(null);
   const [loader, setLoader] = useState(false);
-
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
 
   const [loaneeDetailsData, setLoaneeDetailsData] = useState({
     name: "",
@@ -476,18 +458,7 @@ function AddUser() {
                   />
                 </Grid>
 
-                {/* <Grid item xs={12} sm={12}>
-                  <Button
-                    onClick={() => {
-                      calculateLoan();
-                    }}
-                  >
-                    Calculate
-                  </Button>
-                </Grid> */}
-
                 <Grid item xs={12} sm={12}>
-                  {/* {calLoan?.calOriginal !== "" && ( */}
                   <TableContainer component={Paper}>
                     <Table
                       sx={{ minWidth: 650 }}
@@ -524,7 +495,6 @@ function AddUser() {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                  {/* )} */}
                 </Grid>
               </Grid>
             </Paper>

@@ -22,7 +22,8 @@ function PaymentEntry() {
   const [currentInstallment, setCurrentInstallment] = useState();
   const [principleBalanceTotal, setPrincipleBalanceTotal] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-  const url = urlEdit()
+  const [allPaidMessage, setAllPaidMessage] = useState("");
+  const url = urlEdit();
 
   const [paymentDetailsData, setPaymentDetailsData] = useState({
     date: "",
@@ -47,20 +48,20 @@ function PaymentEntry() {
   };
 
   const fetchLoanNumberData = () => {
-    setLoader(true)
+    setLoader(true);
     axios
       .get(`${url}/fetch/` + loanNumber)
       .then((res) => {
         if (typeof res?.data === "object") {
           setLoanNumberData(res?.data);
           setDataPresent(true);
-          setLoader(false)
+          setLoader(false);
           handleClickOpen();
         }
       })
       .catch((err) => {
         setErrorMessage("No matching user found.");
-        setLoader(false)
+        setLoader(false);
         console.log(err);
       });
   };
@@ -80,7 +81,33 @@ function PaymentEntry() {
     if (sort?.[0]) {
       setCurrentInstallment(sort?.[0]);
     }
+
+    
+    // console.log(
+    //   "Object.keys(currentInstallment).length",
+    //   Object.keys(currentInstallment).length
+    // );
+
+    if (dataPresent && (currentInstallment === undefined || currentInstallment === null)) {
+      setAllPaidMessage("All installments paid");
+    } else {
+      setAllPaidMessage("");
+    }
   }, [loanNumberData, loanNumber]);
+  console.log(
+    "currentInstallment",
+    currentInstallment
+  );
+
+
+  // useEffect(() => {
+  //   if (
+  //     loanNumberData?.installmentsData &&
+  //     Object.keys(currentInstallment).length === 0
+  //   ) {
+  //     setAllPaidMessage("All intstallments paid");
+  //   }
+  // }, [loanNumberData, currentInstallment]);
 
   ///////////snack
 
@@ -116,8 +143,6 @@ function PaymentEntry() {
     setLoanNumber();
   };
 
-  console.log('@@@!! loader', loader)
-
   const updateLoanNumberData = () => {
     if (
       paymentDetailsData?.date !== "" &&
@@ -126,10 +151,8 @@ function PaymentEntry() {
       paymentDetailsData?.interestAmount !== "" &&
       paymentDetailsData?.overDueAmount !== ""
     ) {
-
       setOpen(false);
-      setLoader(true)
-      console.log('@@!! 2')
+      setLoader(true);
       const balance =
         parseInt(loanNumberData?.loanDetailsData?.totalAmount) -
         (parseInt(principleBalanceTotal) +
@@ -187,11 +210,15 @@ function PaymentEntry() {
           JSON.stringify(bal);
       }
 
+      console.log("newInstallment10", newInstallment10);
+
       const newLoanNumberData = { ...loanNumberData };
       newLoanNumberData.installmentsData = [
         ...loanNumberData?.installmentsData,
       ];
-      
+
+      console.log("newLoanNumberData", newLoanNumberData);
+
       axios
         .put(
           `${url}/update/` + loanNumberData?.id,
@@ -217,6 +244,8 @@ function PaymentEntry() {
   const handleClickOpen = () => {
     setOpen(true);
   };
+
+  console.log('allpaid', allPaidMessage)
 
   return (
     <div>
@@ -283,8 +312,11 @@ function PaymentEntry() {
           </Paper>
         </Box>
       )}
+      {allPaidMessage !== "" && (
+        <Alert severity="error">{allPaidMessage}</Alert>
+      )}
 
-      {dataPresent && (
+      {dataPresent && allPaidMessage === "" && (
         <React.Fragment>
           <Dialog open={open} onClose={handleClose}>
             <DialogTitle>HP Number : {loanNumberData?.id} </DialogTitle>
@@ -294,7 +326,6 @@ function PaymentEntry() {
             <DialogTitle>
               Due Date : {formatDateddmmyyyy(currentInstallment?.dueDate)}{" "}
             </DialogTitle>
-
             <DialogContent>
               <TextField
                 required

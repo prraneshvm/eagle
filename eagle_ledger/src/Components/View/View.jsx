@@ -2,26 +2,13 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Box, Paper, Typography, Grid, TextField, Button } from "@mui/material";
-// import TableRender from "./Components/TableRender/TableRender";
 import TableRender from "../TableRender/TableRender";
-
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import PropTypes from "prop-types";
-import { overDueCalculator, formatDateddmmyyyy, urlEdit } from "../../Common/Common";
+import { formatDateddmmyyyy, urlEdit } from "../../Common/Common";
 import Loader from "../Loader/Loader";
-import Backdrop from "@mui/material/Backdrop";
-
-import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
 
 function View() {
   const [loanNumber, setLoanNumber] = useState();
@@ -45,14 +32,6 @@ function View() {
   });
 
   const url = urlEdit()
-
-  const handlePaymentDetailsData = (event) => {
-    setFieldsRequiredAlert(false);
-    setPaymentDetailsData({
-      ...paymentDetailsData,
-      [event?.target?.name]: event?.target?.value,
-    });
-  };
 
   const handleLoanNumber = (event) => {
     setErrorMessage("");
@@ -86,30 +65,15 @@ function View() {
 
   const [file, setFile] = useState(null);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+  
 
   
 
-  const [imageId, setImageId] = useState("");
+  
 
   const [base64String1, setBase64String1] = useState("");
 
-  const convertToBase64 = (event) => {
-    const file = event.target.files[0];
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const result = e.target.result;
-        setBase64String1(result);
-      };
-
-      reader.readAsDataURL(file);
-    }
-  };
+  
 
   /////////////////////////////////////
 
@@ -234,7 +198,6 @@ function View() {
                 <Tab label="Loan Details" {...a11yProps(0)} />
                 <Tab label="Loanee Details" {...a11yProps(1)} />
                 <Tab label="Guarantee Details" {...a11yProps(2)} />
-
                 <Tab label="Vehicle Details" {...a11yProps(3)} />
               </Tabs>
             </Box>

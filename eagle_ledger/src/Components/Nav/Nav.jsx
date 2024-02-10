@@ -32,23 +32,6 @@ function Nav() {
   };
 
   return (
-    // <Box sx={{ flexGrow: 1, backgroundColor: "black" }}>
-    //   <AppBar position="static">
-    //     <Toolbar>
-    //       {!(window.location.pathname === "/home" ||
-    //         window.location.pathname === "/") && (
-    //         <Button
-    //           color="inherit"
-    //           onClick={() => {
-    //             navigate("/home");
-    //           }}
-    //         >
-    //           Home
-    //         </Button>
-    //       )}
-    //     </Toolbar>
-    //   </AppBar>
-    // </Box>
     <div>
       { loader && <Loader />}
       {!(window?.location?.pathname === "/login") && (

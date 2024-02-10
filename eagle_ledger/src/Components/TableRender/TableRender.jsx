@@ -8,10 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { formatDateddmmyyyy } from '../../Common/Common';
 
-
 export default function DenseTable(props) {
-
-  console.log('props', props)
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">

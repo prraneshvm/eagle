@@ -45,7 +45,6 @@ function App() {
   }, [snackbar, open]);
 
   const handleLogout = () => {
-    // Implement your logout logic here (e.g., redirect, clear session, etc.)
     setLoader(true);
     const url = urlEdit()
     axios
