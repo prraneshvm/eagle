@@ -1,7 +1,9 @@
 const urlEdit = () => {
   //const url = "http://3.98.123.149:4000";
   // const url = 'http://172.31.5.223:4000'
-  const url = 'http://localhost:4000'
+  
+  const url = "http://34.69.20.170:4000";
+  //const url = 'http://localhost:4000'
   return url;
 };
 
