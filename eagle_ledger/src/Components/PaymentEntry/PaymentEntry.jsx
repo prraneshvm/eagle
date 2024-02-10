@@ -11,6 +11,7 @@ import Alert from "@mui/material/Alert";
 import { overDueCalculator, formatDateddmmyyyy } from "../../Common/Common";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
+import { urlEdit } from "../../Common/Common";
 
 function PaymentEntry() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function PaymentEntry() {
   const [currentInstallment, setCurrentInstallment] = useState();
   const [principleBalanceTotal, setPrincipleBalanceTotal] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const url = urlEdit()
 
   const [paymentDetailsData, setPaymentDetailsData] = useState({
     date: "",
@@ -47,7 +49,7 @@ function PaymentEntry() {
   const fetchLoanNumberData = () => {
     setLoader(true)
     axios
-      .get("http://localhost:4000/fetch/" + loanNumber)
+      .get(`${url}/fetch/` + loanNumber)
       .then((res) => {
         if (typeof res?.data === "object") {
           setLoanNumberData(res?.data);
@@ -192,7 +194,7 @@ function PaymentEntry() {
       
       axios
         .put(
-          "http://localhost:4000/update/" + loanNumberData?.id,
+          `${url}/update/` + loanNumberData?.id,
           newLoanNumberData
         )
         .then((res) => {

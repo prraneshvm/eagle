@@ -1,3 +1,13 @@
+
+const urlEdit = () => {
+  const url = 'http://3.98.123.149:4000'
+  // const url = 'http://172.31.5.223:4000'
+   //const url = 'http://localhost:4000'
+  
+  return url
+}
+
+
 const formatDateddmmyyyy = (data) => {
   const date = new Date(data);
 
@@ -27,4 +37,5 @@ const overDueCalculator = (paid, dueDate, principle, interest) => {
 module.exports = {
   formatDateddmmyyyy,
   overDueCalculator,
+  urlEdit
 };

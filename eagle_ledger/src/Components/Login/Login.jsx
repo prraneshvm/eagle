@@ -18,6 +18,7 @@ import Alert from "@mui/material/Alert";
 import { useContext } from "react";
 import { UserContext } from "../../App";
 import Loader from "../Loader/Loader";
+import { urlEdit } from "../../Common/Common";
 
 function Login() {
   const navigate = useNavigate();
@@ -63,12 +64,11 @@ function Login() {
       });
   };
 
-  const submitLogin = () => {
+  const submitLogin =  () => {
     setLoader(true)
+    const url = urlEdit()
     axios
-       .post("http://localhost:4000/login", loginData)
-      // .post("http://192.168.101.83:4000/login", loginData)
-       //.post("http://3.98.123.149:4000/login", loginData)
+       .post(`${url}/login`, loginData)
       .then((res) => {
         console.log("res", res);
         if (res?.status === 200 && res?.data?.message === "LoginSuccess") {
@@ -77,6 +77,7 @@ function Login() {
           navigate("/home");
         } else {
           setInvaildCred("Invalid username or password");
+          setLoader(false)
           setLoginData({
             username: "",
             password: "",

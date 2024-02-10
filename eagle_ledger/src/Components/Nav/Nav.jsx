@@ -5,6 +5,7 @@ import axios from "axios";
 import { useContext, useState } from "react";
 import { UserContext } from "../../App";
 import Loader from "../Loader/Loader";
+import { urlEdit } from "../../Common/Common";
 
 function Nav() {
   const navigate = useNavigate();
@@ -14,8 +15,9 @@ function Nav() {
 
   const logoutApi = () => {
     setLoader(true);
+    const url = urlEdit()
     axios
-      .get("http://localhost:4000/logout")
+      .get(`${url}/logout`)
       .then((res) => {
         console.log(res);
         if (res?.status === 200 && res?.data?.message === "LogoutSuccess") {

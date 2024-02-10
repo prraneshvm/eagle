@@ -16,7 +16,7 @@ import Stack from "@mui/material/Stack";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import PropTypes from "prop-types";
-import { overDueCalculator, formatDateddmmyyyy } from "../../Common/Common";
+import { overDueCalculator, formatDateddmmyyyy, urlEdit } from "../../Common/Common";
 import Loader from "../Loader/Loader";
 import Backdrop from "@mui/material/Backdrop";
 
@@ -43,6 +43,8 @@ function View() {
     overDueAmount: "",
     totalAmount: "",
   });
+
+  const url = urlEdit()
 
   const handlePaymentDetailsData = (event) => {
     setFieldsRequiredAlert(false);
@@ -88,22 +90,7 @@ function View() {
     setFile(event.target.files[0]);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    axios
-      .post("http://localhost:4000/upload", { formData, id: "1" })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    setFile(null);
-  };
+  
 
   const [imageId, setImageId] = useState("");
 
@@ -168,7 +155,7 @@ function View() {
   const fetchLoanNumberData = () => {
     setLoader(true);
     axios
-      .get("http://localhost:4000/fetch/" + loanNumber)
+      .get(`${url}/fetch/` + loanNumber)
       .then((res) => {
         console.log(res?.data);
         if (typeof res?.data === "object") {

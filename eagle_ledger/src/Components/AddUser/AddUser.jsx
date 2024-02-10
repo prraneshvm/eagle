@@ -42,6 +42,7 @@ import { useTheme } from "@mui/material/styles";
 import Snackbar from "@mui/material/Snackbar";
 import { useNavigate } from "react-router-dom";
 import Loader from "../Loader/Loader";
+import { urlEdit } from "../../Common/Common";
 
 function AddUser() {
   const navigate = useNavigate();
@@ -311,8 +312,9 @@ function AddUser() {
       loanDetailsData?.totalAmount !== ""
     ) {
       setLoader(true)
+      const url = urlEdit()
       axios
-        .post("http://localhost:4000/send", {
+        .post(`${url}/send`, {
           id: loanDetailsData?.loanNumber,
           loaneeDetailsData,
           guaranteeDetailsData,

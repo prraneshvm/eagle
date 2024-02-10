@@ -12,6 +12,7 @@ import Home from "./Components/Home/Home";
 import Login from "./Components/Login/Login";
 import LogoutTimer from "./Components/LogoutTimer/LogoutTimer";
 import Loader from "./Components/Loader/Loader";
+import { urlEdit } from "./Common/Common";
 
 export const UserContext = React.createContext();
 
@@ -46,9 +47,9 @@ function App() {
   const handleLogout = () => {
     // Implement your logout logic here (e.g., redirect, clear session, etc.)
     setLoader(true);
+    const url = urlEdit()
     axios
-      .get("http://localhost:4000/logout")
-      //.get("http://192.168.101.83:4000/logout")
+      .get(`${url}/logout`)
       .then((res) => {
         console.log(res);
         if (res?.status === 200 && res?.data?.message === "LogoutSuccess") {
